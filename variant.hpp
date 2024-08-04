@@ -183,7 +183,7 @@ using max_size_t=typename max_size<T>::type;
 template<class T>
 struct remove_cvref
 {
-  using type=typename std::remove_reference<typename std::remove_cv<T>::type>::type;
+  using type = std::remove_cv_t<std::remove_reference_t<T>>;
 };
 
 
@@ -371,7 +371,7 @@ public:
 };
 
 template<class Variant,class T>
-using Variant_match_t=typename Variant_match<Variant,T>::type;
+using Variant_match_t=typename Variant_match<remove_cvref_t<Variant>,T>::type;
 
 template<class>
 struct make_empty
@@ -467,6 +467,7 @@ struct variant
   static_assert(is_unique_v<variant>,"");
 
   template<class,class>friend class Variant_destroy;
+  template<class,class>friend class SMF_control;
 private:
 
   template<class Index>
@@ -562,19 +563,19 @@ public:
       if(other.M_index==-1)
         reset();
       else
-        bool Func[]={SMF_control<Types,variant<Types>>::S_copy_from(this,&other)...};
+        bool Func[]={SMF_control<Types,variant>::S_copy_from(this,&other)...};
       return *this;
     }
     else
     {
       reset();
-      bool Func[]={SMF_control<Types,variant<Types>>::S_copy_from(this,&other)...};
+      bool Func[]={SMF_control<Types,variant>::S_copy_from(this,&other)...};
       return *this;
     }
   }
 
   variant&operator=(variant&&other)noexcept
-      {
+  {
     if(other.M_index==-1&&this->M_index==-1)
       return *this;
     else if(other.M_index==-1||this->M_index==-1)
@@ -582,13 +583,13 @@ public:
       if(other.M_index==-1)
         reset();
       else
-        bool Func[]={SMF_control<Types,variant<Types>>::S_move_from(this,&other)...};
+        bool Func[]={SMF_control<Types,variant>::S_move_from(this,&other)...};
       return *this;
     }
     else
     {
       reset();
-      bool Func[]={SMF_control<Types,variant<Types>>::S_move_from(this,&other)...};
+      bool Func[]={SMF_control<Types,variant>::S_move_from(this,&other)...};
       return *this;
     }
   }
@@ -690,7 +691,22 @@ public:
 
   void swap(variant&other)noexcept
   {
-
+    if(other.M_index==-1&&this->M_index==-1)
+      return;
+    else if(other.M_index==-1||this->M_index==-1)
+    {
+      if(this->M_index==-1)
+        *this=std::move(other);
+      else
+        other=std::move(*this);
+    }
+    else
+    {
+        variant temp;
+        temp=std::move(other);
+        other=std::move(*this);
+        *this=std::move(temp);
+    }
   }
 };
 
