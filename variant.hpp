@@ -493,7 +493,7 @@ public:
   {
     //::visit<void>([&](auto&&value){*this=std::move(other);},*this);
     if(other.M_index!=-1)
-      bool Func[]={SMF_control<Types,variant<Types>>::S_move_from(this,&other)...};
+      bool Func[]={SMF_control<Types,variant>::S_move_from(this,&other)...};
   }
 
   template<class T,class Ti=Variant_match_t<variant,T>,
