@@ -13,7 +13,6 @@ struct is_specialization<Template,Template<Types...>>
     :std::true_type
 {};
 
-
 template<bool,int>
 struct Invoke_helper
 {};
@@ -217,4 +216,5 @@ template <typename R, typename Fn, typename... ArgTypes>
 struct is_nothrow_invocable_r
     : is_nothrow_invocable_r_impl<Fn&&(ArgTypes&&...), R>::type
 {};
+
 #endif //VARIANT_INVOKE_HPP
