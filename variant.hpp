@@ -6,12 +6,6 @@
 #include<iostream>
 #include"invoke.hpp"
 
-/*
- *gen_vtable-->muli_array  and  gen_vtable_impl
- *
- * */
-
-
 template<class T>
 struct type_identity
 {
@@ -269,15 +263,35 @@ constexpr R visit(Visitor&&visitor,Variant&&var)
   }
 }
 
+class bad_variant_access
+    :std::exception
+{
+public:
+
+  explicit bad_variant_access(const char*str)
+    :M_str{str}
+  {}
+
+  bad_variant_access()=default;
+
+  const char*what()const  noexcept override
+  {
+    return M_str;
+  }
+private:
+
+  const char*M_str="bad variant access";
+};
+
+[[noreturn]]void throw_bad_variant_access(const char*string="bad variant access")
+{throw bad_variant_access{string};}
+
 template<class Variant>
 struct Variant_storage
 {
 public:
   template<class Index>
   static constexpr auto S_index_v=Variant_unique_index<Variant,Index>::value;
-
-  template<class Index>
-  static constexpr bool S_exist_once_v=S_index_v<Index>!=-1;
 
 public:
   Variant_storage()noexcept=default;
