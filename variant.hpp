@@ -77,7 +77,7 @@ constexpr in_place_index_t<Idx> in_place_index{};
 template<class T,class...Args>
 constexpr auto
 construct_at(T* location,Args&&...args)
-noexcept(noexcept(::new((void*)0)T(std::declval<Args>()...)))
+noexcept(noexcept(::new(nullptr)T(std::declval<Args>()...)))
 -> decltype(::new(nullptr)T(std::declval<Args>()...))
 { return ::new((void*)location)T(std::forward<Args>(args)...); }
 
